@@ -15,6 +15,12 @@ module.exports = {
                     loader: 'babel-loader',
                 },
             },
+            // https://webpack.js.org/guides/asset-management/
+            // I have no idea about text loader, so it's json now!
+            {
+                test: /\.(json)$/i,
+                use: ['json-loader'],
+            },
         ],
     },
     plugins: [
