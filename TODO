@@ -1,0 +1,2 @@
+- Right now we recreate the spans each update. We can't store references to the spans and just change their position, because some spans span over spaces and pretext might split 'em, but we should try to do as little updating as possible.
+- The [OpenFont js lib](https://github.com/opentypejs/opentype.js/) has methods to measure text... I should bench them against the ctx measureText method.
