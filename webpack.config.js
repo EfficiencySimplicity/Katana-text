@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('html-webpack-plugin');
 module.exports = {
-    entry: './index.js',
+    entry: './src/index.js',
     output: {
         path: path.resolve(__dirname, 'dist'),
         filename: 'bundle.js',
@@ -21,11 +21,15 @@ module.exports = {
                 test: /\.(json)$/i,
                 use: ['json-loader'],
             },
+            {
+                test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                type: 'asset/resource',
+            },
         ],
     },
     plugins: [
         new webpack({
-            template: './index.html',
+            template: './src/index.html',
         }),
     ],
 };

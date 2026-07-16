@@ -9,6 +9,7 @@
     "babel-preset-env": "^0.0.0",
     "babel-preset-react": "^6.24.1",
     "json-loader": "^0.5.7",
+    "opentype.js": "^2.0.0",
     "shuffle-array": "^1.0.1"
   },
   "devDependencies": {
