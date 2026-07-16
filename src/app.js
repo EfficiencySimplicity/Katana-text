@@ -6,6 +6,7 @@ import { prepareRichInline, walkRichInlineLineRanges, materializeRichInlineLineR
 
 import shuffle from "shuffle-array";
 import text from './sample-text'
+import font from './font';
 
 // https://quickref.me/repeat-an-array.html
 const repeat = (arr, n) => Array(arr.length * n).fill(0).map((_, i) => arr[i % arr.length]);
@@ -13,10 +14,10 @@ const repeat = (arr, n) => Array(arr.length * n).fill(0).map((_, i) => arr[i % a
 
 // let text = "Once Upon A Time In The Old Days ".repeat(100)
 //.split(" ")
-const PREPARED = prepareWithSegments(text, "16px Inter");
+const PREPARED = prepareWithSegments(text, "16px FontFamily Style Bitter");
 
 const ctx = document.getElementById("measurer").getContext("2d");
-ctx.font = "16px Inter"
+ctx.font = "16px FontFamily Style Bitter"
 
 // https://18.react.dev/reference/react/useState
 
@@ -70,7 +71,7 @@ class App extends Component {
         // let elements = text.map(x => <span style={{position: "absolute"}}>{x+" "}</span>);
 
         return (
-            <p id="text">
+            <p id="text" style = {{fontFamily: "FontFamily Style Bitter"}}>
                 {shuffle(elements)}
             </p>
         );
