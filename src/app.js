@@ -1,17 +1,14 @@
 // https://www.geeksforgeeks.org/reactjs/reactjs-babel-introduction/
 import React, { Component, useState} from 'react';
 
-import { prepare, layout, walkLineRanges, prepareWithSegments, layoutWithLines } from '@chenglou/pretext';
-import { prepareRichInline, walkRichInlineLineRanges, materializeRichInlineLineRange } from '@chenglou/pretext/rich-inline';
+import {prepareWithSegments, layoutWithLines } from '@chenglou/pretext';
 
 import shuffle from "shuffle-array";
 import text from './sample-text'
+// This is so that all the font stuff is loaded beforehand
+// Is this important?
+// I do not know at all
 import font from './font';
-
-// https://quickref.me/repeat-an-array.html
-const repeat = (arr, n) => Array(arr.length * n).fill(0).map((_, i) => arr[i % arr.length]);
-
-
 // let text = "Once Upon A Time In The Old Days ".repeat(100)
 //.split(" ")
 const PREPARED = prepareWithSegments(text, "16px FontFamily Style Bitter");
