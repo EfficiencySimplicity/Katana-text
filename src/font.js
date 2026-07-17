@@ -1,4 +1,5 @@
 import opentype from 'opentype.js'
+import shuffle from 'shuffle-array';
 import {decompress} from 'woff2-encoder'
 
 // https://github.com/fontello/wawoff2/issues/14
@@ -9,35 +10,91 @@ let buffer = fetch("https://fonts.gstatic.com/s/bitter/v7/HEpP8tJXlWaYHimsnXgfCO
 // decompress before parsing
 const openFont = opentype.parse(await decompress(await buffer));
 
-// We swap the A and the D for now
-let glyphs = openFont.glyphs.glyphs;
+/**
+ * The unicode start and end may not match the glyph indices
+ * in the font, but instead the glyph's unicode value
+ * the unicode_end is inclusive; see
+ * https://en.wikipedia.org/wiki/List_of_Unicode_characters#Table_Basic_Latin;
+ * the default of 122 for the end is z, lowercase
+ */
+function shuffleFont(font, u_start = 65, u_end = 122) {
+    console.log("all glyphs", font.glyphs.glyphs)
+    let glyphs = Object.values(font.glyphs.glyphs).filter(x => x.unicode >= u_start && x.unicode <= u_end);
+    console.log("glyphs to consider", glyphs);
+    // This already does images and unicode; why not just be a whole copy?
+    // Or would that lead to reassignment; a = b, b = c, c = a sorta loop?...
+    let glyph_images = glyphs.map(x => {return {unicode: x.unicode, advanceWidth: x.advanceWidth, path: x.path}});
+    console.log("glyph data to shuffle", glyph_images);
 
-console.log(glyphs[36].path, glyphs[39].path)
+    glyph_images = shuffle(glyph_images)
+    console.log("shuffled glyph data", glyph_images);
 
-let adv_wid_a = glyphs[36].advanceWidth;
-let path_a = glyphs[36].path
-glyphs[36] = new opentype.Glyph({
-  name: 'A',
-  unicode: 65,
-  advanceWidth: glyphs[39].advanceWidth,
-  path: glyphs[39].path
-})
-glyphs[39] = new opentype.Glyph({
-  name: 'D',
-  unicode: 68,
-  advanceWidth: adv_wid_a,
-  path: path_a
-})
+    let unicode_map = {};
 
-console.log(glyphs[36].name, glyphs[39].name)
-console.log(glyphs[36].path, glyphs[39].path)
+    for (let i=0; i < glyphs.length; i++) {
+        font.glyphs.glyphs[36 + i] = new opentype.Glyph({
+            name: glyphs[i].name,
+            unicode: glyphs[i].unicode,
+            advanceWidth: glyph_images[i].advanceWidth,
+            path: glyph_images[i].path
+        })
+        unicode_map[glyph_images[i].unicode] = String.fromCharCode(glyphs[i].unicode)
+    }
+
+    // TODO: get all other chars in here so we don't need to account for a possible
+    // nonexistent char...
+    console.log("mapped unicode", unicode_map)
+
+    let map_unicode = (char_code) => {
+        return char_code in unicode_map? unicode_map[char_code]: String.fromCharCode(char_code)
+    }
+
+    let shuffleText = (text) => {
+        let ending_text = []
+        for (let i = 0; i < text.length; i++) {
+            // https://www.geeksforgeeks.org/javascript/get-unicode-character-value-in-javascript/
+            let unicode = text.charCodeAt(i);
+            ending_text.push(map_unicode(unicode))
+        }
+        return ending_text.join("");
+    }
+
+    return [font, shuffleText];
+}
+
+// // We swap the A and the D for now
+// let glyphs = openFont.glyphs.glyphs;
+
+// console.log(glyphs[36].path, glyphs[39].path)
+
+// let adv_wid_a = glyphs[36].advanceWidth;
+// let path_a = glyphs[36].path
+// glyphs[36] = new opentype.Glyph({
+//   name: 'A',
+//   unicode: 65,
+//   advanceWidth: glyphs[39].advanceWidth,
+//   path: glyphs[39].path
+// })
+// glyphs[39] = new opentype.Glyph({
+//   name: 'D',
+//   unicode: 68,
+//   advanceWidth: adv_wid_a,
+//   path: path_a
+// })
+
+// console.log(glyphs[36].name, glyphs[39].name)
+// console.log(glyphs[36].path, glyphs[39].path)
+
+let [shufFont, shuffleText] = shuffleFont(openFont)
 
 // https://stackoverflow.com/questions/11355147/font-face-changing-via-javascript
 const fontFile = await new FontFace(
   "FontFamily Style Bitter",
-  openFont.toArrayBuffer(),
+  shufFont.toArrayBuffer(),
 ).load();
 document.fonts.add(fontFile);
+
+export default shuffleText
 
 
 // REFERENCE OF THE FIELDS

@@ -8,10 +8,10 @@ import text from './sample-text'
 // This is so that all the font stuff is loaded beforehand
 // Is this important?
 // I do not know at all
-import font from './font';
+import shuffleText from './font';
 // let text = "Once Upon A Time In The Old Days ".repeat(100)
 //.split(" ")
-const PREPARED = prepareWithSegments(text, "16px FontFamily Style Bitter");
+const PREPARED = prepareWithSegments(shuffleText(text), "16px FontFamily Style Bitter");
 
 const ctx = document.getElementById("measurer").getContext("2d");
 ctx.font = "16px FontFamily Style Bitter"
