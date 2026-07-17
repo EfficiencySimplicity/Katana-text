@@ -30,7 +30,8 @@ class App extends Component {
         //debugger;
         let width = this.state.width;
 
-        const { lines } = layoutWithLines(PREPARED, width, 20);
+        const lineInfo = layoutWithLines(PREPARED, width, 20);
+        const lines = lineInfo.lines;
 
         let elements = [];
 
@@ -42,7 +43,7 @@ class App extends Component {
             // say startIdx = 0; line length is 7;
             while (startIdx < lines[i].text.length) {
                 // we pick 8 as a length; and it gets shrunk to 7;
-                let length = Math.min(Math.floor(Math.random() * 5 + 5), lines[i].text.length - startIdx);
+                let length = Math.min(Math.floor(Math.random() * 10 + 5), lines[i].text.length - startIdx);
                 // 0-7 is the whole thing
                 let word = lines[i].text.slice(startIdx, startIdx+length)
                 elements.push(<span style = {{position: 'absolute', top: i*20, left: start, whiteSpace: "pre"}}>{word}</span>)
@@ -68,7 +69,7 @@ class App extends Component {
         // let elements = text.map(x => <span style={{position: "absolute"}}>{x+" "}</span>);
 
         return (
-            <p id="text" style = {{fontFamily: "FontFamily Style Bitter"}}>
+            <p id="text" style = {{height: lineInfo.height, fontFamily: "FontFamily Style Bitter"}}>
                 {shuffle(elements)}
             </p>
         );
