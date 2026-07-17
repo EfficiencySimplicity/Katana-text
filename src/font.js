@@ -12,22 +12,20 @@ const openFont = opentype.parse(await decompress(await buffer));
 
 /**
  * The unicode start and end may not match the glyph indices
- * in the font, but instead the glyph's unicode value
- * the unicode_end is inclusive; see
+ * in the font, but instead the glyph's unicode value.
+ * The unicode_end is inclusive; see
  * https://en.wikipedia.org/wiki/List_of_Unicode_characters#Table_Basic_Latin;
  * the default of 122 for the end is z, lowercase
  */
 function shuffleFont(font, u_start = 65, u_end = 122) {
-    console.log("all glyphs", font.glyphs.glyphs)
+
     let glyphs = Object.values(font.glyphs.glyphs).filter(x => x.unicode >= u_start && x.unicode <= u_end);
-    console.log("glyphs to consider", glyphs);
+
     // This already does images and unicode; why not just be a whole copy?
     // Or would that lead to reassignment; a = b, b = c, c = a sorta loop?...
     let glyph_images = glyphs.map(x => {return {unicode: x.unicode, advanceWidth: x.advanceWidth, path: x.path}});
-    console.log("glyph data to shuffle", glyph_images);
 
     glyph_images = shuffle(glyph_images)
-    console.log("shuffled glyph data", glyph_images);
 
     let unicode_map = {};
 
@@ -42,7 +40,7 @@ function shuffleFont(font, u_start = 65, u_end = 122) {
     }
 
     // TODO: get all other chars in here so we don't need to account for a possible
-    // nonexistent char...
+    // nonexistent char via map_unicode...
     console.log("mapped unicode", unicode_map)
 
     let map_unicode = (char_code) => {
@@ -61,29 +59,6 @@ function shuffleFont(font, u_start = 65, u_end = 122) {
 
     return [font, shuffleText];
 }
-
-// // We swap the A and the D for now
-// let glyphs = openFont.glyphs.glyphs;
-
-// console.log(glyphs[36].path, glyphs[39].path)
-
-// let adv_wid_a = glyphs[36].advanceWidth;
-// let path_a = glyphs[36].path
-// glyphs[36] = new opentype.Glyph({
-//   name: 'A',
-//   unicode: 65,
-//   advanceWidth: glyphs[39].advanceWidth,
-//   path: glyphs[39].path
-// })
-// glyphs[39] = new opentype.Glyph({
-//   name: 'D',
-//   unicode: 68,
-//   advanceWidth: adv_wid_a,
-//   path: path_a
-// })
-
-// console.log(glyphs[36].name, glyphs[39].name)
-// console.log(glyphs[36].path, glyphs[39].path)
 
 let [shufFont, shuffleText] = shuffleFont(openFont)
 

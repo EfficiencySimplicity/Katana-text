@@ -6,9 +6,6 @@ Katana uses the Pretext library (ironic that it's used here to stop AI scraping 
 
 - Absolutely positions the words as spans which are shuffled in the DOM structure, and
 - Some of them overlap
-
-In the future, it is planned that-
-
 - A custom font is applied that maps each character to a different one, so the actual text content is Quasi-Caesar'd around a bit
 
 # How to run
