@@ -1,7 +1,2 @@
 - Right now we recreate the spans each update. We can't store references to the spans and just change their position, because some spans span over spaces and pretext might split 'em, but we should try to do as little updating as possible.
 - The [OpenFont js lib](https://github.com/opentypejs/opentype.js/) has methods to measure text... I should bench them against the ctx measureText method.
-
-- Ok, so we need a system... we need a system to 
-- take a url + name and add the font to the window + return shuffler
-- take text and font and return a proper function component and all that
-- I.E. We can't very well pass props, would ruin all privacy. Gotta create a function that creates a mapped component.
