@@ -4,60 +4,55 @@ import React, { Component, useState, useEffect} from 'react';
 import {prepareWithSegments, layoutWithLines } from '@chenglou/pretext';
 
 import shuffle from "shuffle-array";
-import text from './sample-text'
-import shuffleText from './font';
 
-const PREPARED = prepareWithSegments(shuffleText(text), "16px FontFamily Style Bitter");
+export default function createKatanaTextComponent(font, text) {
 
-const ctx = document.getElementById("measurer").getContext("2d");
-ctx.font = "16px FontFamily Style Bitter"
+    const PREPARED = prepareWithSegments(font.encode(text), `16px ${font.name}`);
 
-// https://18.react.dev/reference/react/useState
-
-function App() {
-    // https://stackoverflow.com/questions/69228336/how-to-call-useeffect-when-browser-is-resized
-    const [docWidth, setDocWidth] = useState(window.innerWidth)
-    
-    // https://www.w3schools.com/react/react_useeffect.asp
-    const handleWindowSizeChange = () => {
-        setDocWidth(window.innerWidth);
-    };
-
-    useEffect(() => {
-        window.addEventListener('resize', handleWindowSizeChange);
-        return () => {
-            window.removeEventListener('resize', handleWindowSizeChange);
+    return function KatanaTextComponent() {
+        // https://stackoverflow.com/questions/69228336/how-to-call-useeffect-when-browser-is-resized
+        const [docWidth, setDocWidth] = useState(window.innerWidth)
+        
+        // https://www.w3schools.com/react/react_useeffect.asp
+        const handleWindowSizeChange = () => {
+            setDocWidth(window.innerWidth);
         };
-    }, []);
 
-    const lineInfo = layoutWithLines(PREPARED, docWidth, 20);
-    const lines = lineInfo.lines;
+        useEffect(() => {
+            window.addEventListener('resize', handleWindowSizeChange);
+            return () => {
+                window.removeEventListener('resize', handleWindowSizeChange);
+            };
+        }, []);
 
-    let elements = [];
+        const lineInfo = layoutWithLines(PREPARED, docWidth, 20);
+        const lines = lineInfo.lines;
 
-    for(let i=0; i < lines.length; i++) {
+        let elements = [];
 
-        let start = 0;
-        let startIdx = 0;
+        for(let i=0; i < lines.length; i++) {
 
-        while (startIdx < lines[i].text.length) {
-            let length = Math.min(Math.floor(Math.random() * 10 + 5), lines[i].text.length - startIdx);
+            let start = 0;
+            let startIdx = 0;
 
-            let word = lines[i].text.slice(startIdx, startIdx+length)
-            elements.push(<span style = {{position: 'absolute', top: i*20, left: start, whiteSpace: "pre"}}>{word}</span>)
+            while (startIdx < lines[i].text.length) {
+                let length = Math.min(Math.floor(Math.random() * 10 + 5), lines[i].text.length - startIdx);
 
-            let newStartIdx = startIdx + length - Math.floor(Math.random() * (length / 2))
+                let word = lines[i].text.slice(startIdx, startIdx+length)
+                elements.push(<span style = {{position: 'absolute', top: i*20, left: start, whiteSpace: "pre"}}>{word}</span>)
 
-            start += ctx.measureText(lines[i].text.slice(startIdx, newStartIdx)).width;
+                let newStartIdx = startIdx + length - Math.floor(Math.random() * (length / 2))
 
-            startIdx = newStartIdx;
+                start += font.ctx.measureText(lines[i].text.slice(startIdx, newStartIdx)).width;
+
+                startIdx = newStartIdx;
+            }
         }
-    }
 
-    return (
-        <p id="text" style = {{height: lineInfo.height, fontFamily: "FontFamily Style Bitter"}}>
-            {shuffle(elements)}
-        </p>
-    );
+        return (
+            <p id="text" style = {{height: lineInfo.height, fontFamily: font.name}}>
+                {shuffle(elements)}
+            </p>
+        );
+    }
 }
-export default App;

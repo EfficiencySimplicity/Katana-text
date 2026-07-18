@@ -2,13 +2,38 @@ import opentype from 'opentype.js'
 import shuffle from 'shuffle-array';
 import {decompress} from 'woff2-encoder'
 
-// https://github.com/fontello/wawoff2/issues/14
-// https://github.com/itskyedo/woff2-encoder
+/**
+ * Gathers a WOFF font from the url,
+ * shuffles the glyphs,
+ * and loads it in the document
+ * (meaning any text in the document can use this font)
+ * 
+ * Returns a function that takes a string and shuffles the characters
+ * so that the font unshuffles it
+ */
+export default async function loadAndScrambleFont(url, name) {
+    // https://github.com/fontello/wawoff2/issues/14
+    // https://github.com/itskyedo/woff2-encoder
+    let res = await fetch(url);
+    let font = opentype.parse(await decompress(await res.arrayBuffer()));
+    let [shuf_font, shuffler] = shuffleFont(font);
 
-let buffer = fetch("https://fonts.gstatic.com/s/bitter/v7/HEpP8tJXlWaYHimsnXgfCOvvDin1pK8aKteLpeZ5c0A.woff2").then(res => res.arrayBuffer());
+    // https://stackoverflow.com/questions/11355147/font-face-changing-via-javascript
+    const fontFile = await new FontFace(
+        name,
+        shuf_font.toArrayBuffer(),
+    ).load();
+    document.fonts.add(fontFile);
 
-// decompress before parsing
-const openFont = opentype.parse(await decompress(await buffer));
+    const ctx = document.createElement("canvas").getContext("2d");
+    ctx.font = `16px ${name}`
+
+    return {
+        name: name,
+        encode: shuffler,
+        ctx: ctx,
+    }
+}
 
 /**
  * The unicode start and end may not match the glyph indices
@@ -59,18 +84,6 @@ function shuffleFont(font, u_start = 65, u_end = 122) {
 
     return [font, shuffleText];
 }
-
-let [shufFont, shuffleText] = shuffleFont(openFont)
-
-// https://stackoverflow.com/questions/11355147/font-face-changing-via-javascript
-const fontFile = await new FontFace(
-  "FontFamily Style Bitter",
-  shufFont.toArrayBuffer(),
-).load();
-document.fonts.add(fontFile);
-
-export default shuffleText
-
 
 // REFERENCE OF THE FIELDS
 
