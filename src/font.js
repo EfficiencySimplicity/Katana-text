@@ -26,12 +26,20 @@ export default async function loadAndScrambleFont(url, name) {
     document.fonts.add(fontFile);
 
     const ctx = document.createElement("canvas").getContext("2d");
-    ctx.font = `16px ${name}`
+
+    // For local calculations
+    function setPixHeight(height) {
+        ctx.font = `${height}px ${name}`
+        console.log(ctx.font);
+    }
+
+    setPixHeight(16)
 
     return {
         name: name,
         encode: shuffler,
         ctx: ctx,
+        setPixHeight: setPixHeight,
     }
 }
 
