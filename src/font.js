@@ -8,14 +8,15 @@ import {decompress} from 'woff2-encoder'
  * and loads it in the document
  * (meaning any text in the document can use this font)
  * 
- * Returns a function that takes a string and shuffles the characters
- * so that the font unshuffles it
+ * Returns a font object that is used with createKatanaTextComponent
+ * to create Katana text components
  */
 export default async function loadAndShuffleFont(url, name) {
     // https://github.com/fontello/wawoff2/issues/14
     // https://github.com/itskyedo/woff2-encoder
     let res = await fetch(url);
     let font = opentype.parse(await decompress(await res.arrayBuffer()));
+
     let [shuf_font, shuffler] = shuffleFont(font);
 
     // https://stackoverflow.com/questions/11355147/font-face-changing-via-javascript
@@ -30,7 +31,6 @@ export default async function loadAndShuffleFont(url, name) {
     // For local calculations
     function setPixHeight(height) {
         ctx.font = `${height}px ${name}`
-        console.log(ctx.font);
     }
 
     setPixHeight(16)
@@ -74,20 +74,18 @@ function shuffleFont(font, u_start = 65, u_end = 122) {
 
     // TODO: get all other chars in here so we don't need to account for a possible
     // nonexistent char via map_unicode...
-    console.log("mapped unicode", unicode_map)
 
     let map_unicode = (char_code) => {
         return char_code in unicode_map? unicode_map[char_code]: String.fromCharCode(char_code)
     }
 
+    // This is an incredible and concise tutorial!
+    // https://www.30secondsofcode.org/js/s/map-string/
     let shuffleText = (text) => {
-        let ending_text = []
-        for (let i = 0; i < text.length; i++) {
-            // https://www.geeksforgeeks.org/javascript/get-unicode-character-value-in-javascript/
-            let unicode = text.charCodeAt(i);
-            ending_text.push(map_unicode(unicode))
-        }
-        return ending_text.join("");
+        return text.split('')
+        // // https://www.geeksforgeeks.org/javascript/get-unicode-character-value-in-javascript/
+        .map((c) => map_unicode(c.charCodeAt(0)))
+        .join('');
     }
 
     return [font, shuffleText];

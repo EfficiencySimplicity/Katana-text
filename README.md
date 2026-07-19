@@ -26,6 +26,14 @@ If you want to protect against your run-of-the-mill scraper from taking the text
 
 This returns a React function component you can use wherever you want;
 
+It will automatically update its height based on the text inside it, but it is recommended that you set the width explicitly, though it seems to have no issues with it.
+
+```js
+    <createdComponentFunction width="75%"/>
+```
+
+See the demos folder on Github for a good idea of how it should be used.
+
 ### Note:
 
 createKatanaTextComponent() is not a React component,
