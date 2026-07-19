@@ -1,5 +1,5 @@
 // https://www.geeksforgeeks.org/reactjs/reactjs-babel-introduction/
-import React, { Component, useState, useEffect} from 'react';
+import React, { Component, useCallback, useState, useEffect, useRef, useLayoutEffect} from 'react';
 
 import {prepareWithSegments, layoutWithLines } from '@chenglou/pretext';
 
@@ -9,23 +9,42 @@ export default function createKatanaTextComponent(font, text, pix_height = 16, l
 
     const PREPARED = prepareWithSegments(font.encode(text), `${pix_height}px ${font.name}`);
 
-    return function KatanaTextComponent() {
+    return function KatanaTextComponent(props) {
         // https://stackoverflow.com/questions/69228336/how-to-call-useeffect-when-browser-is-resized
-        const [docWidth, setDocWidth] = useState(window.innerWidth)
-        
-        // https://www.w3schools.com/react/react_useeffect.asp
-        const handleWindowSizeChange = () => {
-            setDocWidth(window.innerWidth);
-        };
+        const [width, setWidth] = useState()
+        const myRef = useRef();
 
+        // https://blog.logrocket.com/using-resizeobserver-react-responsive-designs/
+        // https://trackjs.com/javascript-errors/resizeobserver-loop-completed-with-undelivered-notifications/
         useEffect(() => {
-            window.addEventListener('resize', handleWindowSizeChange);
-            return () => {
-                window.removeEventListener('resize', handleWindowSizeChange);
-            };
+            if (myRef.current) {
+                const observer = new ResizeObserver(() => {
+                    if (myRef.current.offsetWidth != width) {
+                        // https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver
+                        requestAnimationFrame(() => {
+                            setWidth(myRef.current.offsetWidth)
+                            console.log("Width changed")
+                        })
+                    }
+                });
+
+                observer.observe(myRef.current);
+
+                // Cleanup function
+                return () => {
+                    observer.disconnect();
+                };
+            }
         }, []);
 
-        const lineInfo = layoutWithLines(PREPARED, docWidth, line_height);
+        // https://stackoverflow.com/questions/49058890/how-to-get-a-react-components-size-height-width-before-render
+        useLayoutEffect(() => {
+            if (myRef.current) {
+                setWidth(myRef.current.offsetWidth);
+            }
+        })
+
+        const lineInfo = layoutWithLines(PREPARED, width, line_height);
         const lines = lineInfo.lines;
 
         let elements = [];
@@ -53,7 +72,7 @@ export default function createKatanaTextComponent(font, text, pix_height = 16, l
         }
 
         return (
-            <p style = {{position: "relative", height: lineInfo.height, fontFamily: `${font.name}`, fontSize: `${pix_height}px`}}>
+            <p ref = {myRef} style = {{position: "relative", width: props.width, height: lineInfo.height, fontFamily: `${font.name}`, fontSize: `${pix_height}px`}}>
                 {shuffle(elements)}
             </p>
         );

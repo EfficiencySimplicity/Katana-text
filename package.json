@@ -1,4 +1,12 @@
 {
+  "name": "Katana-text",
+  "version": "1.0.0",
+  "description": "Lightweight scraping prevention system for text content",
+  "git repository": "https://github.com/EfficiencySimplicity/Katana-text",
+  "keywords": ["anti-scraping", "katana", "anti-ai", "security"],
+  "author": "Joshua Ward",
+  "license": "MIT",
+
   "scripts": {
     "start": "webpack-dev-server --mode development --open",
     "build": "webpack --mode production"

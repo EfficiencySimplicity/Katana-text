@@ -8,9 +8,28 @@ Katana uses the Pretext library (ironic that it's used here to stop AI scraping 
 - Some of them overlap
 - A custom font is applied that maps each character to a different one, so the actual text content is Quasi-Caesar'd around a bit
 
-# How to run
+# Why use Katana?
 
-npm run start.
+If you want to protect against your run-of-the-mill scraper from taking the text on your site, while not requiring a performance-heavy solution like Anubis or setting up and managing a tar pit, Katana-text is a good choice
+
+(ya can still do those things though!)
+
+# How to use it
+
+- Run loadAndShuffleFont(), passing in the url to a .woff file and the name you want to call the resulting font; this returns a Font management object
+
+- For every text block you want to render, call createKatanaTextComponent(), passing in:
+    - The font object you got earlier
+    - The text it should contain
+    - The height in pixels of the text
+    - The line height (should be more than the height in pixels)
+
+This returns a React function component you can use wherever you want;
+
+### Note:
+
+createKatanaTextComponent() is not a React component,
+it returns a *function* that is.
 
 # The backstory
 

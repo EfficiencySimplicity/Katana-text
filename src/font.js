@@ -11,7 +11,7 @@ import {decompress} from 'woff2-encoder'
  * Returns a function that takes a string and shuffles the characters
  * so that the font unshuffles it
  */
-export default async function loadAndScrambleFont(url, name) {
+export default async function loadAndShuffleFont(url, name) {
     // https://github.com/fontello/wawoff2/issues/14
     // https://github.com/itskyedo/woff2-encoder
     let res = await fetch(url);
